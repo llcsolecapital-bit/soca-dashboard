@@ -6,42 +6,60 @@
   <title>SOCA HFT Dashboard</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg: #0a0a0f; --card: #12121a; --border: #2a2a3a;
-      --text: #fff; --muted: #888; --green: #00ff88; --red: #ff4466; --blue: #4488ff;
-    }
-    body { font-family: 'SF Mono', monospace; background: var(--bg); color: var(--text); }
-    .header { display: flex; justify-content: space-between; padding: 16px 24px; background: var(--card); border-bottom: 1px solid var(--border); }
-    .logo { font-size: 18px; font-weight: 600; letter-spacing: 2px; }
+    :root { --bg: #0a0a0f; --card: #12121a; --card2: #1a1a24; --border: #2a2a3a; --text: #fff; --muted: #888; --green: #00ff88; --red: #ff4466; --blue: #4488ff; --yellow: #ffaa00; --purple: #aa66ff; }
+    body { font-family: 'SF Mono', 'Consolas', monospace; background: var(--bg); color: var(--text); }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
     .status { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
-    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-    .dot.green { background: var(--green); } .dot.red { background: var(--red); } .dot.yellow { background: #ffaa00; }
-    .main { display: grid; grid-template-columns: 1fr 300px; gap: 16px; padding: 16px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
+    .dot.green { background: var(--green); } .dot.red { background: var(--red); } .dot.yellow { background: var(--yellow); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; padding: 16px; }
     .stats { grid-column: 1/-1; display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; }
-    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
     .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { font-size: 24px; font-weight: 600; margin-top: 4px; }
+    .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
     .stat-value.green { color: var(--green); } .stat-value.red { color: var(--red); }
-    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-    .panel-body { padding: 12px; max-height: 300px; overflow-y: auto; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); display: flex; justify-content: space-between; }
+    .panel-body { max-height: 320px; overflow-y: auto; }
     .left { display: flex; flex-direction: column; gap: 16px; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
     th { font-size: 10px; color: var(--muted); text-transform: uppercase; }
     .sym { color: var(--blue); font-weight: 600; }
     .pos { color: var(--green); } .neg { color: var(--red); }
-    .trade { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-    .badge { padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+    .trade { display: flex; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-right: 8px; }
     .badge.buy { background: rgba(0,255,136,.15); color: var(--green); }
     .badge.sell { background: rgba(255,68,102,.15); color: var(--red); }
-    .watch { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-    .controls { display: flex; gap: 8px; padding: 12px; }
-    .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+    .watch { display: flex; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .change { font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+    .change.up { background: rgba(0,255,136,.12); color: var(--green); }
+    .change.down { background: rgba(255,68,102,.12); color: var(--red); }
+    .signal { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+    .signal-head { display: flex; justify-content: space-between; }
+    .signal-sym { color: var(--purple); font-weight: 600; }
+    .signal-conf { color: var(--yellow); font-size: 12px; }
+    .signal-det { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .settings { padding: 16px; }
+    .setting-row { display: flex; gap: 12px; margin-bottom: 12px; }
+    .setting-input { flex: 1; }
+    .setting-input label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .setting-input input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px; color: var(--text); font-family: inherit; font-size: 14px; }
+    .setting-input input:focus { outline: none; border-color: var(--blue); }
+    .tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .tab { padding: 12px 16px; font-size: 11px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--blue); }
+    .controls { display: flex; gap: 10px; padding: 16px; border-top: 1px solid var(--border); }
+    .btn { flex: 1; padding: 14px; border: none; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
     .btn-start { background: var(--green); color: #000; }
     .btn-stop { background: var(--red); color: #fff; }
     .btn-close { background: var(--border); color: var(--text); }
-    .empty { text-align: center; padding: 24px; color: var(--muted); }
+    .btn-save { background: var(--blue); color: #fff; width: 100%; margin-top: 8px; }
+    .empty { text-align: center; padding: 32px; color: var(--muted); }
     @media(max-width:900px) { .main { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(3,1fr); } }
   </style>
 </head>
@@ -55,82 +73,155 @@
       <span id="lastUpd">--</span>
     </div>
   </header>
+ 
   <main class="main">
     <div class="stats">
-      <div class="stat"><div class="stat-label">Today P&L</div><div class="stat-value" id="dayPnl">$0</div></div>
-      <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="totPnl">$0</div></div>
-      <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="winRate">0%</div></div>
-      <div class="stat"><div class="stat-label">Open Pos</div><div class="stat-value" id="openPos">0</div></div>
-      <div class="stat"><div class="stat-label">Bot</div><div class="stat-value" id="botStat">OFF</div></div>
-      <div class="stat"><div class="stat-label">TP/SL</div><div class="stat-value" id="tpsl">0.3/0.2%</div></div>
+      <div class="stat"><div class="stat-label">Today P&L</div><div class="stat-value" id="dayPnl">$0</div><div class="stat-sub" id="dayTrades">0 trades</div></div>
+      <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="totPnl">$0</div><div class="stat-sub" id="totTrades">0 trades</div></div>
+      <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="winRate">0%</div><div class="stat-sub" id="winLoss">0W / 0L</div></div>
+      <div class="stat"><div class="stat-label">Positions</div><div class="stat-value" id="openPos">0</div><div class="stat-sub" id="unrealized">$0 unrealized</div></div>
+      <div class="stat"><div class="stat-label">Bot</div><div class="stat-value" id="botStat">OFF</div><div class="stat-sub" id="dataSource">--</div></div>
+      <div class="stat"><div class="stat-label">Mode</div><div class="stat-value" style="color:var(--yellow)">PAPER</div><div class="stat-sub">Simulated</div></div>
     </div>
+ 
     <div class="left">
-      <div class="panel"><div class="panel-header">Open Positions</div><div class="panel-body" id="posBody"><div class="empty">No positions</div></div></div>
-      <div class="panel"><div class="panel-header">Trade Log</div><div class="panel-body" id="logBody"><div class="empty">No trades</div></div></div>
+      <div class="panel">
+        <div class="panel-header"><span>Open Positions</span><span id="posCount">0</span></div>
+        <div class="panel-body" id="posBody"><div class="empty">No positions</div></div>
+      </div>
+      <div class="panel" style="flex:1">
+        <div class="panel-header"><span>Trade History</span><span id="tradeCount">0</span></div>
+        <div class="panel-body" id="logBody" style="max-height:400px"><div class="empty">No trades yet</div></div>
+      </div>
       <div class="controls">
-        <button class="btn btn-start" id="startBtn" onclick="start()">Start</button>
-        <button class="btn btn-stop" id="stopBtn" onclick="stop()" style="display:none">Stop</button>
-        <button class="btn btn-close" onclick="closeAll()">Close All</button>
+        <button class="btn btn-start" id="startBtn" onclick="startBot()">▶ Start</button>
+        <button class="btn btn-stop" id="stopBtn" onclick="stopBot()" style="display:none">⏹ Stop</button>
+        <button class="btn btn-close" onclick="closeAll()">✕ Close All</button>
       </div>
     </div>
+ 
     <div style="display:flex;flex-direction:column;gap:16px">
-      <div class="panel"><div class="panel-header">Watchlist</div><div class="panel-body" id="watchBody"><div class="empty">Loading...</div></div></div>
-      <div class="panel"><div class="panel-header">Signals</div><div class="panel-body" id="sigBody"><div class="empty">Waiting...</div></div></div>
+      <div class="panel">
+        <div class="tabs">
+          <div class="tab active" onclick="showTab('settings')">Settings</div>
+          <div class="tab" onclick="showTab('watch')">Watchlist</div>
+          <div class="tab" onclick="showTab('signals')">Signals</div>
+        </div>
+        <div id="settingsTab" class="settings">
+          <div class="setting-row">
+            <div class="setting-input"><label>Take Profit %</label><input type="number" id="setTP" step="0.1" value="0.3"></div>
+            <div class="setting-input"><label>Stop Loss %</label><input type="number" id="setSL" step="0.1" value="0.2"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-input"><label>Position Size %</label><input type="number" id="setPosSize" step="1" value="5"></div>
+            <div class="setting-input"><label>Max Positions</label><input type="number" id="setMaxPos" step="1" value="5"></div>
+          </div>
+          <button class="btn btn-save" onclick="saveSettings()">💾 Save Settings</button>
+        </div>
+        <div id="watchTab" class="panel-body" style="display:none"><div class="empty">Loading...</div></div>
+        <div id="signalsTab" class="panel-body" style="display:none"><div class="empty">Waiting...</div></div>
+      </div>
     </div>
   </main>
+ 
   <script>
-    const API='https://soca-proxy-production.up.railway.app';
-    const f=(n,d=2)=>(n||0).toFixed(d);
-    const pnl=n=>{const v=parseFloat(n)||0;return(v>=0?'+':'')+`$${f(Math.abs(v))}`};
-    const tm=iso=>iso?new Date(iso).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'--';
+    const API = 'https://soca-proxy-production.up.railway.app';
+    const f = (n,d=2) => (parseFloat(n)||0).toFixed(d);
+    const pnl = n => { const v=parseFloat(n)||0; return (v>=0?'+':'')+`$${f(Math.abs(v))}`; };
+    const pct = n => { const v=parseFloat(n)||0; return (v>=0?'+':'')+f(v,3)+'%'; };
+    const tm = iso => iso ? new Date(iso).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--';
  
-    async function load(){
-      try{
-        const[st,qt]=await Promise.all([fetch(`${API}/bot/status`).then(r=>r.json()),fetch(`${API}/quote/AAPL,MSFT,NVDA,GOOGL,AMZN,META,SPY,QQQ,IWM,TSLA,COIN,PLTR`).then(r=>r.json())]);
-        
-        document.getElementById('schwabDot').className=`dot ${st.schwabConnected?'green':'red'}`;
-        document.getElementById('schwabTxt').textContent=st.schwabConnected?'Schwab ✓':'Disconnected';
-        document.getElementById('streamDot').className=`dot ${st.streamerConnected?'green':'yellow'}`;
-        document.getElementById('streamTxt').textContent=st.streamerConnected?'Stream':'Poll';
-        document.getElementById('mktDot').className=`dot ${st.marketStatus==='OPEN'?'green':'yellow'}`;
-        document.getElementById('mktTxt').textContent=st.marketStatus||'--';
-        document.getElementById('lastUpd').textContent=tm(qt.lastUpdate);
- 
-        const s=st.stats||{};
-        const dp=document.getElementById('dayPnl');dp.textContent=pnl(s.todayPnL);dp.className=`stat-value ${s.todayPnL>=0?'green':'red'}`;
-        const tp=document.getElementById('totPnl');tp.textContent=pnl(s.totalPnL);tp.className=`stat-value ${s.totalPnL>=0?'green':'red'}`;
-        document.getElementById('winRate').textContent=s.totalTrades>0?f(s.wins/s.totalTrades*100,1)+'%':'0%';
-        document.getElementById('openPos').textContent=st.positions?.length||0;
-        const bs=document.getElementById('botStat');bs.textContent=st.botRunning?'ON':'OFF';bs.className=`stat-value ${st.botRunning?'green':''}`;
-        document.getElementById('tpsl').textContent=`${st.settings?.scalp_tp_pct||0.3}/${st.settings?.scalp_sl_pct||0.2}%`;
- 
-        document.getElementById('startBtn').style.display=st.botRunning?'none':'block';
-        document.getElementById('stopBtn').style.display=st.botRunning?'block':'none';
- 
-        // Positions
-        const pos=st.positions||[];
-        document.getElementById('posBody').innerHTML=pos.length?`<table><tr><th>Sym</th><th>Qty</th><th>Entry</th><th>Now</th><th>P&L</th></tr>${pos.map(p=>`<tr><td class="sym">${p.sym}</td><td>${p.qty}</td><td>$${f(p.avgPrice)}</td><td>$${f(p.currentPrice)}</td><td class="${p.pnl>=0?'pos':'neg'}">${pnl(p.pnl)}</td></tr>`).join('')}</table>`:'<div class="empty">No positions</div>';
- 
-        // Trade log
-        const log=st.tradeLog||[];
-        document.getElementById('logBody').innerHTML=log.length?log.slice(0,30).map(t=>`<div class="trade"><div><span class="badge ${t.side.toLowerCase()}">${t.side}</span> <span class="sym">${t.sym}</span> ${t.qty}@$${f(t.price)}</div><div>${t.pnl?`<span class="${parseFloat(t.pnl)>=0?'pos':'neg'}">${pnl(t.pnl)}</span>`:''} <span style="color:var(--muted)">${tm(t.time)}</span></div></div>`).join(''):'<div class="empty">No trades</div>';
- 
-        // Watchlist
-        const tickers=qt.tickers||[];
-        document.getElementById('watchBody').innerHTML=tickers.length?tickers.map(q=>`<div class="watch"><span class="sym">${q.ticker}</span><span>$${f(q.lastPrice)} <span class="${(q.netChangePct||0)>=0?'pos':'neg'}">${(q.netChangePct||0)>=0?'+':''}${f(q.netChangePct||0)}%</span></span></div>`).join(''):'<div class="empty">No data</div>';
- 
-        // Signals
-        const sig=st.signalLog||[];
-        document.getElementById('sigBody').innerHTML=sig.length?sig.slice(0,15).map(s=>`<div class="watch"><span class="sym">${s.sym}</span><span>${s.direction} ${s.confidence}%</span></div>`).join(''):'<div class="empty">Waiting...</div>';
- 
-      }catch(e){console.error(e)}
+    function showTab(t) {
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showTab('${t}')"]`).classList.add('active');
+      document.getElementById('settingsTab').style.display = t==='settings' ? 'block' : 'none';
+      document.getElementById('watchTab').style.display = t==='watch' ? 'block' : 'none';
+      document.getElementById('signalsTab').style.display = t==='signals' ? 'block' : 'none';
     }
  
-    async function start(){try{await fetch(`${API}/bot/start`,{method:'POST'});load()}catch(e){}}
-    async function stop(){try{await fetch(`${API}/bot/stop`,{method:'POST'});load()}catch(e){}}
-    async function closeAll(){if(!confirm('Close all?'))return;try{await fetch(`${API}/bot/closeall`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason:'MANUAL'})});load()}catch(e){}}
+    async function saveSettings() {
+      const s = {
+        scalp_tp_pct: parseFloat(document.getElementById('setTP').value),
+        scalp_sl_pct: parseFloat(document.getElementById('setSL').value),
+        scalp_pos_pct: parseFloat(document.getElementById('setPosSize').value),
+        scalp_max_positions: parseInt(document.getElementById('setMaxPos').value)
+      };
+      try {
+        const r = await fetch(`${API}/bot/settings`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(s) });
+        if ((await r.json()).ok) alert('Settings saved!');
+      } catch(e) { alert('Failed'); }
+    }
  
-    load();setInterval(load,1000);
+    async function load() {
+      try {
+        const [st,qt] = await Promise.all([
+          fetch(`${API}/bot/status`).then(r=>r.json()),
+          fetch(`${API}/quote/AAPL,MSFT,NVDA,GOOGL,AMZN,META,SPY,QQQ,IWM,TSLA,COIN,PLTR`).then(r=>r.json())
+        ]);
+ 
+        document.getElementById('schwabDot').className = `dot ${st.schwabConnected?'green':'red'}`;
+        document.getElementById('schwabTxt').textContent = st.schwabConnected ? 'Schwab ✓' : 'Disconnected';
+        document.getElementById('streamDot').className = `dot ${st.streamerConnected?'green':'yellow'}`;
+        document.getElementById('streamTxt').textContent = st.streamerConnected ? 'Stream' : 'Poll';
+        document.getElementById('mktDot').className = `dot ${st.marketStatus==='OPEN'?'green':'yellow'}`;
+        document.getElementById('mktTxt').textContent = st.marketStatus || '--';
+        document.getElementById('lastUpd').textContent = tm(qt.lastUpdate);
+ 
+        const s = st.stats || {};
+        const dp = document.getElementById('dayPnl'); dp.textContent = pnl(s.todayPnL); dp.className = `stat-value ${s.todayPnL>=0?'green':'red'}`;
+        document.getElementById('dayTrades').textContent = `${s.todayTrades||0} trades`;
+        const tp = document.getElementById('totPnl'); tp.textContent = pnl(s.totalPnL); tp.className = `stat-value ${s.totalPnL>=0?'green':'red'}`;
+        document.getElementById('totTrades').textContent = `${s.totalTrades||0} trades`;
+        document.getElementById('winRate').textContent = s.totalTrades>0 ? f(s.wins/s.totalTrades*100,1)+'%' : '0%';
+        document.getElementById('winLoss').textContent = `${s.wins||0}W / ${s.losses||0}L`;
+        document.getElementById('openPos').textContent = st.positions?.length || 0;
+        document.getElementById('posCount').textContent = st.positions?.length || 0;
+        const unr = (st.positions||[]).reduce((sum,p)=>sum+(p.pnl||0),0);
+        const unrEl = document.getElementById('unrealized'); unrEl.textContent = pnl(unr)+' unreal'; unrEl.style.color = unr>=0?'var(--green)':'var(--red)';
+        const bs = document.getElementById('botStat'); bs.textContent = st.botRunning?'ON':'OFF'; bs.className = `stat-value ${st.botRunning?'green':''}`;
+        document.getElementById('dataSource').textContent = st.dataSource || '--';
+        document.getElementById('startBtn').style.display = st.botRunning ? 'none' : 'block';
+        document.getElementById('stopBtn').style.display = st.botRunning ? 'block' : 'none';
+ 
+        const set = st.settings || {};
+        document.getElementById('setTP').value = set.scalp_tp_pct || 0.3;
+        document.getElementById('setSL').value = set.scalp_sl_pct || 0.2;
+        document.getElementById('setPosSize').value = set.scalp_pos_pct || 5;
+        document.getElementById('setMaxPos').value = set.scalp_max_positions || 5;
+ 
+        // Positions
+        const pos = st.positions || [];
+        document.getElementById('posBody').innerHTML = pos.length ? 
+          `<table><tr><th>Sym</th><th>Qty</th><th>Entry</th><th>Now</th><th>P&L</th><th>Time</th></tr>${pos.map(p=>`<tr><td class="sym">${p.sym}</td><td>${p.qty}</td><td>$${f(p.avgPrice)}</td><td>$${f(p.currentPrice)}</td><td class="${p.pnl>=0?'pos':'neg'}">${pnl(p.pnl)}<br><small>${pct(p.pnlPct)}</small></td><td>${p.holdTime}</td></tr>`).join('')}</table>` 
+          : '<div class="empty">No positions</div>';
+ 
+        // Trade log
+        const log = st.tradeLog || [];
+        document.getElementById('tradeCount').textContent = log.length;
+        document.getElementById('logBody').innerHTML = log.length ?
+          log.slice(0,100).map(t => `<div class="trade"><div><span class="badge ${t.side.toLowerCase()}">${t.side}</span><span class="sym">${t.sym}</span> ${t.qty}@$${f(t.price)} ${t.reason?'· '+t.reason:''}</div><div style="text-align:right">${t.pnl?`<span class="${parseFloat(t.pnl)>=0?'pos':'neg'}">${pnl(t.pnl)}</span><br>`:''}${tm(t.time)}</div></div>`).join('')
+          : '<div class="empty">No trades yet</div>';
+ 
+        // Watchlist
+        const tickers = qt.tickers || [];
+        document.getElementById('watchTab').innerHTML = tickers.length ?
+          tickers.map(q => `<div class="watch"><span class="sym">${q.ticker}</span><span>$${f(q.lastPrice)}<span class="change ${(q.netChangePct||0)>=0?'up':'down'}">${(q.netChangePct||0)>=0?'+':''}${f(q.netChangePct||0)}%</span></span></div>`).join('')
+          : '<div class="empty">No data</div>';
+ 
+        // Signals
+        const sig = st.signalLog || [];
+        document.getElementById('signalsTab').innerHTML = sig.length ?
+          sig.slice(0,20).map(s => `<div class="signal"><div class="signal-head"><span class="signal-sym">${s.sym}</span><span class="signal-conf">${s.confidence}%</span></div><div class="signal-det">${s.direction} @ $${f(s.price)} · Mom: ${s.momentum}% · ↑${s.upTicks} ↓${s.downTicks}</div></div>`).join('')
+          : '<div class="empty">Waiting...</div>';
+ 
+      } catch(e) { console.error(e); }
+    }
+ 
+    async function startBot() { try { await fetch(`${API}/bot/start`,{method:'POST'}); load(); } catch(e){} }
+    async function stopBot() { try { await fetch(`${API}/bot/stop`,{method:'POST'}); load(); } catch(e){} }
+    async function closeAll() { if(!confirm('Close all?'))return; try { await fetch(`${API}/bot/closeall`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason:'MANUAL'})}); load(); } catch(e){} }
+ 
+    load(); setInterval(load, 1000);
   </script>
 </body>
 </html>
